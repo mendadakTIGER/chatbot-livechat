@@ -8,16 +8,27 @@ type Message = {
   content: string;
 };
 
+const LIVECHAT_LICENSE = "19256201";
+
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showCSButton, setShowCSButton] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const openLiveChat = () => {
+    window.open(
+      `https://www.livechat.com/chat-with/${LIVECHAT_LICENSE}/`,
+      "_blank",
+      "width=400,height=600"
+    );
+  };
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,6 +43,7 @@ export default function ChatWidget() {
     setMessages((prev) => [...prev, userMsg]);
     setInputValue("");
     setIsLoading(true);
+    setShowCSButton(false);
 
     try {
       const res = await fetch("/api/chat", {
@@ -54,6 +66,19 @@ export default function ChatWidget() {
       };
 
       setMessages((prev) => [...prev, aiMsg]);
+
+      // Tampilkan tombol CS jika chatbot tidak bisa jawab
+      const triggerWords = [
+        "livechat", "live chat", "operator", "cs", "customer service",
+        "tidak bisa", "tidak dapat", "hubungi", "konfirmasi", "deposit",
+        "withdraw", "belum masuk", "belum diproses", "akun", "banned",
+        "diblokir", "error", "gagal", "masalah teknis"
+      ];
+      const shouldShowCS = triggerWords.some((word) =>
+        data.content.toLowerCase().includes(word)
+      );
+      setShowCSButton(shouldShowCS);
+
     } catch (err) {
       console.error(err);
     } finally {
@@ -111,6 +136,21 @@ export default function ChatWidget() {
                 </div>
               </div>
             ))}
+
+            {/* Tombol Chat dengan CS */}
+            {showCSButton && !isLoading && (
+              <div className="flex justify-start">
+                <button
+                  onClick={openLiveChat}
+                  className="bg-green-500 hover:bg-green-600 text-white text-sm rounded-xl px-4 py-2 flex items-center gap-2 shadow-sm transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                  </svg>
+                  Chat dengan CS Kami
+                </button>
+              </div>
+            )}
 
             {isLoading && (
               <div className="flex justify-start">
