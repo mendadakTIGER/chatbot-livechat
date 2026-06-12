@@ -109,9 +109,11 @@ export default function ChatWidget() {
           style={{ height: "500px" }}
         >
           <div className="bg-blue-600 text-white p-4 flex items-center gap-3">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-sm font-bold">
-              AI
-            </div>
+            <img
+              src="/friday-avatar.jpg"
+              alt="Friday"
+              className="w-8 h-8 rounded-full object-cover border border-white/40"
+            />
             <div>
               <p className="font-semibold text-sm">Friday Elsar</p>
               <p className="text-xs text-blue-100">Online • Siap membantu</p>
@@ -126,12 +128,24 @@ export default function ChatWidget() {
             )}
 
             {messages.map((m) => (
-              <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
-                  m.role === "user"
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-800 border border-gray-200 shadow-sm"
-                }`}>
+              <div
+                key={m.id}
+                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                {m.role === "assistant" && (
+                  <img
+                    src="/friday-avatar.jpg"
+                    alt="Friday"
+                    className="w-8 h-8 rounded-full object-cover mr-2 self-start"
+                  />
+                )}
+
+                <div
+                  className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${m.role === "user"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-800 border border-gray-200 shadow-sm"
+                    }`}
+                >
                   {m.content}
                 </div>
               </div>
